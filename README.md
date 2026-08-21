@@ -15,6 +15,8 @@ MERCURY is an incident-response command center built around the official [Sibyl 
 
 The primary proof is `INC-104`: restarting `payments-worker` worsens the incident through duplicate queue processing. A later fresh session retrieves `INC-104`, changes `restart_worker` to `drain_queue_then_rollback`, and displays **MEMORY CHANGED THIS DECISION**.
 
+[Watch the 27-second MERCURY demo](./public/mercury-demo.mp4) or open **DEMO VIDEO** in the deployed dashboard navigation.
+
 ## Run with Docker
 
 ```bash
@@ -79,4 +81,3 @@ docker compose --profile contracts run --rm contracts
 - [Demo script](DEMO.md)
 - [Evaluation](EVALUATION.md)
 - [Safety](SAFETY.md)
-

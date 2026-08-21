@@ -1,5 +1,7 @@
 # Demo
 
+[Watch the 27-second captions-only product demo](./public/mercury-demo.mp4). It is generated reproducibly with `python scripts/render_demo_video.py`.
+
 1. Start MERCURY with Docker Compose or both native services.
 2. Click **1 · Record Session A**.
 3. Show `INC-104`: baseline restart, simulated duplicate processing, operator recovery by draining and rolling back.
@@ -12,4 +14,3 @@
 10. If the Base contract is configured, connect an operator wallet, anchor, and show the verified transaction. Otherwise show `NOT ANCHORED`.
 
 CLI proof: `python scripts/fresh_session_smoke.py`.
-

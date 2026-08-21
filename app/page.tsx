@@ -39,15 +39,29 @@ export default function Home() {
 
   useEffect(() => {
     Promise.all([api<Scenario[]>("/api/scenarios"), api<{ status: string; memory: { status: string } }>("/api/health")])
-      .then(([items, state]) => { setScenarios(items); setHealth(state); })
+      .then(async ([items, state]) => {
+        setScenarios(items); setHealth(state);
+        const incidentId = new URLSearchParams(window.location.search).get("incident");
+        if (incidentId) {
+          const restored = await api<Incident>(`/api/incidents/${incidentId}`);
+          setIncident(restored);
+          setNotice(`${restored.incident_id} restored from Sibyl after refresh.`);
+        }
+      })
       .catch((error: Error) => { setHealth({ status: "degraded" }); setNotice(error.message); });
   }, []);
+
+  function rememberIncident(incidentId: string) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("incident", incidentId);
+    window.history.replaceState({}, "", url);
+  }
 
   async function startScenario(scenarioId = selectedScenario) {
     setBusy(true); setForget(null); setRemember(null); setCommitment(null); setTransactionHash(null);
     try {
       const created = await api<Incident>("/api/incidents", { method: "POST", body: JSON.stringify({ scenario_id: scenarioId }) });
-      setIncident(created); setNotice(`${created.incident_id} persisted to Sibyl. Choose FORGET or REMEMBER.`); return created;
+      setIncident(created); rememberIncident(created.incident_id); setNotice(`${created.incident_id} persisted to Sibyl. Choose FORGET or REMEMBER.`); return created;
     } catch (error) { setNotice((error as Error).message); throw error; }
     finally { setBusy(false); }
   }
@@ -73,7 +87,7 @@ export default function Home() {
         executed_action: "restart_worker", result: "worse", detail: "Restart causes duplicate queue processing",
         recovery_time_minutes: 31, operator_feedback: "modified", successful_action: "drain_queue_then_rollback", supersedes: [],
       }) });
-      setIncident(resolved); setForget(null); setRemember(null); setNotice(`SESSION A COMPLETE · ${resolved.incident_id} is durable in Sibyl. Start a fresh Session B.`);
+      setIncident(resolved); rememberIncident(resolved.incident_id); setForget(null); setRemember(null); setNotice(`SESSION A COMPLETE · ${resolved.incident_id} is durable in Sibyl. Start a fresh Session B.`);
     } catch (error) { setNotice((error as Error).message); }
     finally { setBusy(false); }
   }
@@ -121,7 +135,7 @@ export default function Home() {
     <main className="shell">
       <header className="topbar">
         <div className="brand"><span className="brandMark">M</span><div><b>MERCURY</b><small>PERSISTENT INCIDENT INTELLIGENCE</small></div></div>
-        <nav className="topnav" aria-label="Command center sections"><span>SCENARIOS</span><span>MEMORY TRACE</span><span>SAFETY</span><span>PROVENANCE</span></nav>
+        <nav className="topnav" aria-label="Command center sections"><a href="/mercury-demo.mp4" target="_blank" rel="noreferrer">DEMO VIDEO ↗</a><span>MEMORY TRACE</span><span>SAFETY</span><span>PROVENANCE</span></nav>
         <div className="systemState"><span className={`pulse ${health?.status === "degraded" ? "bad" : ""}`} /> SIBYL MEMORY {health?.memory?.status?.toUpperCase() ?? "CHECKING"}<em>BASE SEPOLIA · {transactionHash ? "PENDING/VERIFIED" : "UNANCHORED"}</em></div>
       </header>
 
