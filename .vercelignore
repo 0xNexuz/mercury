@@ -1,0 +1,8 @@
+api/
+contracts/
+data/
+evals/
+scripts/
+docker-compose.yml
+Dockerfile
+*.md
