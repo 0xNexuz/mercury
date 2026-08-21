@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import math
+import subprocess
 from pathlib import Path
 
 import cv2
+import imageio_ffmpeg
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -137,4 +139,28 @@ def render(output: Path) -> None:
 
 
 if __name__ == "__main__":
-    render(ROOT / "public" / "mercury-demo.mp4")
+    source = ROOT / "work" / "mercury-demo-source.mp4"
+    output = ROOT / "public" / "mercury-demo.mp4"
+    render(source)
+    subprocess.run(
+        [
+            imageio_ffmpeg.get_ffmpeg_exe(),
+            "-y",
+            "-i",
+            str(source),
+            "-an",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "medium",
+            "-crf",
+            "20",
+            "-pix_fmt",
+            "yuv420p",
+            "-movflags",
+            "+faststart",
+            str(output),
+        ],
+        check=True,
+    )
+    source.unlink(missing_ok=True)
