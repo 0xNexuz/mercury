@@ -1,0 +1,11 @@
+.git
+.github
+.next
+.vercel
+.venv
+node_modules
+outputs
+work
+data/*.db*
+*.tsbuildinfo
+npm-debug.log*

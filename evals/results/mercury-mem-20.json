@@ -1,0 +1,465 @@
+{
+  "benchmark": "MERCURY-MEM-20",
+  "generated_at": "2026-08-21T03:34:55.560162Z",
+  "method": "20 deterministic incidents against six persisted historical lessons",
+  "without_memory": {
+    "cases": 20,
+    "correct_mitigation_rate": 0,
+    "repeated_failure_rate": 1,
+    "unsafe_policy_violation_rate": 0,
+    "mean_recovery_time_minutes": 50.65,
+    "memory_use_rate": 0,
+    "decision_change_rate": 0
+  },
+  "with_sibyl": {
+    "cases": 20,
+    "correct_mitigation_rate": 1,
+    "repeated_failure_rate": 0,
+    "unsafe_policy_violation_rate": 0,
+    "mean_recovery_time_minutes": 12.85,
+    "memory_use_rate": 1,
+    "decision_change_rate": 1
+  },
+  "cases": [
+    {
+      "case_id": "CASE-001",
+      "scenario": "payments-queue",
+      "without_memory": {
+        "action": "restart_worker",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 48,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "drain_queue_then_rollback",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 17,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-002",
+      "scenario": "database-saturation",
+      "without_memory": {
+        "action": "restart_database",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 55,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "shed_load_and_raise_pool",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 14,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-003",
+      "scenario": "api-latency",
+      "without_memory": {
+        "action": "scale_out",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 41,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "rollback_deployment",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 11,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-004",
+      "scenario": "expired-credential",
+      "without_memory": {
+        "action": "restart_service",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 37,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "rotate_credential",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 9,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-005",
+      "scenario": "cache-stampede",
+      "without_memory": {
+        "action": "flush_cache",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 62,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "enable_request_coalescing",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 13,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-006",
+      "scenario": "dependency-outage",
+      "without_memory": {
+        "action": "retry_aggressively",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 59,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "open_circuit_breaker",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 12,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-007",
+      "scenario": "payments-queue",
+      "without_memory": {
+        "action": "restart_worker",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 48,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "drain_queue_then_rollback",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 17,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-008",
+      "scenario": "database-saturation",
+      "without_memory": {
+        "action": "restart_database",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 55,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "shed_load_and_raise_pool",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 14,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-009",
+      "scenario": "api-latency",
+      "without_memory": {
+        "action": "scale_out",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 41,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "rollback_deployment",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 11,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-010",
+      "scenario": "expired-credential",
+      "without_memory": {
+        "action": "restart_service",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 37,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "rotate_credential",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 9,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-011",
+      "scenario": "cache-stampede",
+      "without_memory": {
+        "action": "flush_cache",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 62,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "enable_request_coalescing",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 13,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-012",
+      "scenario": "dependency-outage",
+      "without_memory": {
+        "action": "retry_aggressively",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 59,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "open_circuit_breaker",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 12,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-013",
+      "scenario": "payments-queue",
+      "without_memory": {
+        "action": "restart_worker",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 48,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "drain_queue_then_rollback",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 17,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-014",
+      "scenario": "database-saturation",
+      "without_memory": {
+        "action": "restart_database",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 55,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "shed_load_and_raise_pool",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 14,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-015",
+      "scenario": "api-latency",
+      "without_memory": {
+        "action": "scale_out",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 41,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "rollback_deployment",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 11,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-016",
+      "scenario": "expired-credential",
+      "without_memory": {
+        "action": "restart_service",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 37,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "rotate_credential",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 9,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-017",
+      "scenario": "cache-stampede",
+      "without_memory": {
+        "action": "flush_cache",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 62,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "enable_request_coalescing",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 13,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-018",
+      "scenario": "dependency-outage",
+      "without_memory": {
+        "action": "retry_aggressively",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 59,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "open_circuit_breaker",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 12,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-019",
+      "scenario": "payments-queue",
+      "without_memory": {
+        "action": "restart_worker",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 48,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "drain_queue_then_rollback",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 17,
+        "memory_used": 1,
+        "changed": 1
+      }
+    },
+    {
+      "case_id": "CASE-020",
+      "scenario": "dependency-outage",
+      "without_memory": {
+        "action": "retry_aggressively",
+        "correct": 0,
+        "repeated_failure": 1,
+        "policy_violation": 0,
+        "recovery_minutes": 59,
+        "memory_used": 0,
+        "changed": 0
+      },
+      "with_sibyl": {
+        "action": "open_circuit_breaker",
+        "correct": 1,
+        "repeated_failure": 0,
+        "policy_violation": 0,
+        "recovery_minutes": 12,
+        "memory_used": 1,
+        "changed": 1
+      }
+    }
+  ]
+}
