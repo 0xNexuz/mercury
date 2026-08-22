@@ -46,6 +46,17 @@ npm run dev
 
 The script launches two independent Python processes against the same Sibyl file and fails unless Session B cites `INC-104` and changes the action.
 
+## Share a temporary public demo without Docker
+
+Install Cloudflare's tunnel client once, then run the launcher:
+
+```powershell
+winget install --id Cloudflare.cloudflared --exact --source winget
+.\scripts\start_public_demo.ps1
+```
+
+The script starts FastAPI and Next.js natively, waits for the same-origin `/api/health` proxy, and prints a temporary public `trycloudflare.com` URL. Keep that terminal open while sharing the demo. Stop the native services afterward with `.\scripts\stop_public_demo.ps1`.
+
 In the UI, choose **Record Session A**, then **Start Fresh Session B**. The FORGET side bypasses Sibyl; REMEMBER performs the real query.
 
 ## Verify

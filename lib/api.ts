@@ -1,4 +1,6 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
+// Same-origin by default. Next proxies /api to FastAPI, which lets one local
+// Cloudflare Tunnel expose the complete dashboard without exposing SQLite.
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
