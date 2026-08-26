@@ -1,6 +1,6 @@
 {
   "benchmark": "MERCURY-MEM-20",
-  "generated_at": "2026-08-21T03:34:55.560162Z",
+  "generated_at": "2026-08-25T17:37:33.812369Z",
   "method": "20 deterministic incidents against six persisted historical lessons",
   "without_memory": {
     "cases": 20,

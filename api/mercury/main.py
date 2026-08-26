@@ -12,6 +12,7 @@ from .engine import analyze, fingerprint
 from .memory import IncidentMemoryStore, MemoryUnavailable
 from .models import AnalyzeRequest, IncidentCreate, ResolveRequest, VerifyReceiptRequest, utc_now
 from .provenance import ReceiptVerificationError, commitments, verify_receipt
+from .proof import create_run, execute_worker, get_run
 from .scenarios import ACTIONS, SCENARIOS
 
 app = FastAPI(title="MERCURY API", version="0.1.0", description="Persistent-memory incident intelligence powered by Sibyl Memory")
@@ -38,6 +39,45 @@ def health() -> dict[str, Any]:
 @app.get("/api/scenarios")
 def scenarios() -> list[dict[str, Any]]:
     return [deepcopy(item) for item in SCENARIOS.values()]
+
+
+@app.post("/api/proof-runs", status_code=status.HTTP_201_CREATED)
+def create_proof_run() -> dict[str, Any]:
+    try:
+        return create_run(store.path)
+    except MemoryUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.get("/api/proof-runs/{run_id}")
+def get_proof_run(run_id: str) -> dict[str, Any]:
+    try:
+        proof = get_run(store.path, run_id)
+    except (ValueError, MemoryUnavailable) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    if not proof:
+        raise HTTPException(status_code=404, detail="proof run not found")
+    return proof
+
+
+@app.post("/api/proof-runs/{run_id}/session-a")
+def run_proof_session_a(run_id: str) -> dict[str, Any]:
+    try:
+        return execute_worker(store.path, run_id, "session-a")
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except (RuntimeError, MemoryUnavailable) as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.post("/api/proof-runs/{run_id}/session-b")
+def run_proof_session_b(run_id: str) -> dict[str, Any]:
+    try:
+        return execute_worker(store.path, run_id, "session-b")
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except (RuntimeError, MemoryUnavailable) as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.post("/api/incidents", status_code=status.HTTP_201_CREATED)

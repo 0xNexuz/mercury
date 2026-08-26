@@ -57,7 +57,7 @@ winget install --id Cloudflare.cloudflared --exact --source winget
 
 The script starts FastAPI and Next.js natively, waits for the same-origin `/api/health` proxy, and prints a temporary public `trycloudflare.com` URL. Keep that terminal open while sharing the demo. Stop the native services afterward with `.\scripts\stop_public_demo.ps1`.
 
-In the UI, choose **Record Session A**, then **Start Fresh Session B**. The FORGET side bypasses Sibyl; REMEMBER performs the real query.
+In the UI, choose **Run Session A**, then **Start Fresh Session B**, then **View Proof**. Each judge receives an isolated Sibyl tenant, and the inspector exposes both process identities, the Sibyl entity and journal IDs, termination confirmation, retrieval evidence, both decisions, and Base status.
 
 ## Verify
 
@@ -82,7 +82,7 @@ docker compose --profile contracts run --rm contracts
 - **REAL:** Sibyl persistence, SQLite/FTS5 retrieval, fresh-process recall, deterministic memory influence, safety policy, commitment hashing, on-chain verification when configured.
 - **SIMULATED:** incident telemetry, mitigations, and recovery outcomes.
 - **OPTIONAL/DEFERRED:** Virtuals ACP specialist delegation.
-- **HOSTED PREVIEW:** Vercel presents the visual client; the eligibility proof runs locally/Docker because Sibyl's durable file must live on a persistent volume.
+- **PUBLIC JUDGE PATH:** Cloudflare Tunnel exposes the native production build and real persistent Sibyl file at one HTTPS URL. The stable-host architecture uses a single persistent-volume backend; Vercel remains frontend-only.
 
 ## Documentation
 
@@ -92,3 +92,4 @@ docker compose --profile contracts run --rm contracts
 - [Demo script](DEMO.md)
 - [Evaluation](EVALUATION.md)
 - [Safety](SAFETY.md)
+- [Hosting and public proof](HOSTING.md)

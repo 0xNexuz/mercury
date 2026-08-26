@@ -28,6 +28,11 @@ $env:PYTHONPATH = Join-Path $projectRoot "api"
 $env:SIBYL_DB_PATH = Join-Path $dataDir "memory.db"
 
 try {
+    Write-Host "Building the production dashboard for tunnel-safe client hydration..." -ForegroundColor DarkGray
+    $buildProcess = Start-Process -FilePath $npmExe -ArgumentList @("run", "build") -WorkingDirectory $projectRoot -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput (Join-Path $workDir "build.log") -RedirectStandardError (Join-Path $workDir "build-error.log")
+    if ($buildProcess.ExitCode -ne 0) {
+        throw "MERCURY production build failed. Inspect work/public-demo/build-error.log."
+    }
     $apiStart = @{
         FilePath = $pythonExe
         ArgumentList = @("-m", "uvicorn", "mercury.main:app", "--host", "127.0.0.1", "--port", "8000")
@@ -41,7 +46,7 @@ try {
 
     $webStart = @{
         FilePath = $npmExe
-        ArgumentList = @("run", "dev", "--", "--hostname", "127.0.0.1", "--port", "3000")
+        ArgumentList = @("run", "start", "--", "--hostname", "127.0.0.1", "--port", "3000")
         WorkingDirectory = $projectRoot
         WindowStyle = "Hidden"
         PassThru = $true
@@ -71,9 +76,7 @@ if (-not $ready) {
 $apiListener = Get-NetTCPConnection -State Listen -LocalPort 8000 -ErrorAction Stop | Select-Object -First 1
 $webListener = Get-NetTCPConnection -State Listen -LocalPort 3000 -ErrorAction Stop | Select-Object -First 1
 @{
-    apiLauncher = $apiProcess.Id
     api = $apiListener.OwningProcess
-    webLauncher = $webProcess.Id
     web = $webListener.OwningProcess
 } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $workDir "processes.json")
 

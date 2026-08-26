@@ -45,6 +45,24 @@ class IncidentMemoryStore:
         except SibylMemoryError as exc:
             raise MemoryUnavailable(f"Sibyl write failed: {exc}") from exc
 
+    def set_entity(self, category: str, name: str, body: dict[str, Any], *, status: str = "active") -> dict[str, Any]:
+        """Persist non-incident coordination/proof records in the same Sibyl database."""
+        try:
+            return cast(dict[str, Any], self._client().set_entity(category, name, body, status=status))
+        except SibylMemoryError as exc:
+            raise MemoryUnavailable(f"Sibyl write failed: {exc}") from exc
+
+    def get_entity(self, category: str, name: str) -> dict[str, Any] | None:
+        try:
+            return cast(dict[str, Any], self._client().get_entity(category, name))
+        except NotFoundError:
+            return None
+        except SibylMemoryError as exc:
+            raise MemoryUnavailable(f"Sibyl read failed: {exc}") from exc
+
+    def incident_record(self, incident_id: str) -> dict[str, Any] | None:
+        return self.get_entity("incident", incident_id)
+
     def get(self, incident_id: str) -> dict[str, Any] | None:
         try:
             return cast(dict[str, Any], self._client().get_entity("incident", incident_id)["body"])

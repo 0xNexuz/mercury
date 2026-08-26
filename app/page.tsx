@@ -5,7 +5,7 @@ import Image from "next/image";
 import { createPublicClient, http } from "viem";
 import { baseSepolia } from "viem/chains";
 import { useAccount, useConnect, useSwitchChain, useWriteContract } from "wagmi";
-import { api, Analysis, Commitments, Incident, Scenario } from "../lib/api";
+import { api, Analysis, Commitments, Incident, ProofRun, Scenario } from "../lib/api";
 
 const receiptAbi = [{ type: "function", name: "recordIncident", stateMutability: "nonpayable", inputs: [
   { name: "incidentId", type: "bytes32" }, { name: "memoryContextHash", type: "bytes32" },
@@ -28,6 +28,8 @@ export default function Home() {
   const [notice, setNotice] = useState("Choose a deterministic incident or run the two-session proof.");
   const [busy, setBusy] = useState(false);
   const [evidenceOpen, setEvidenceOpen] = useState(false);
+  const [proofOpen, setProofOpen] = useState(false);
+  const [proof, setProof] = useState<ProofRun | null>(null);
   const { address, isConnected, chainId } = useAccount();
   const { connectors, connectAsync } = useConnect();
   const { switchChainAsync } = useSwitchChain();
@@ -41,7 +43,20 @@ export default function Home() {
     Promise.all([api<Scenario[]>("/api/scenarios"), api<{ status: string; memory: { status: string } }>("/api/health")])
       .then(async ([items, state]) => {
         setScenarios(items); setHealth(state);
-        const incidentId = new URLSearchParams(window.location.search).get("incident");
+        const params = new URLSearchParams(window.location.search);
+        const proofId = params.get("proof");
+        if (proofId) {
+          const restoredProof = await api<ProofRun>(`/api/proof-runs/${proofId}`);
+          setProof(restoredProof);
+          setProofOpen(true);
+          const restoredSession = restoredProof.session_b ?? restoredProof.session_a;
+          if (restoredSession?.incident_snapshot) setIncident(restoredSession.incident_snapshot);
+          if (restoredProof.session_b?.counterfactual_analysis) setForget(restoredProof.session_b.counterfactual_analysis);
+          if (restoredProof.session_b?.memory_analysis) setRemember(restoredProof.session_b.memory_analysis);
+          setNotice(`${proofId} restored entirely from Sibyl after refresh.`);
+          return;
+        }
+        const incidentId = params.get("incident");
         if (incidentId) {
           const restored = await api<Incident>(`/api/incidents/${incidentId}`);
           setIncident(restored);
@@ -54,6 +69,13 @@ export default function Home() {
   function rememberIncident(incidentId: string) {
     const url = new URL(window.location.href);
     url.searchParams.set("incident", incidentId);
+    window.history.replaceState({}, "", url);
+  }
+
+  function rememberProof(runId: string) {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("incident");
+    url.searchParams.set("proof", runId);
     window.history.replaceState({}, "", url);
   }
 
@@ -81,22 +103,28 @@ export default function Home() {
   async function recordSessionA() {
     setBusy(true);
     try {
-      const created = await api<Incident>("/api/incidents", { method: "POST", body: JSON.stringify({ scenario_id: "payments-queue" }) });
-      await api<Analysis>(`/api/incidents/${created.incident_id}/analyze`, { method: "POST", body: JSON.stringify({ memory_mode: "forget" }) });
-      const resolved = await api<Incident>(`/api/incidents/${created.incident_id}/resolve`, { method: "POST", body: JSON.stringify({
-        executed_action: "restart_worker", result: "worse", detail: "Restart causes duplicate queue processing",
-        recovery_time_minutes: 31, operator_feedback: "modified", successful_action: "drain_queue_then_rollback", supersedes: [],
-      }) });
-      setIncident(resolved); rememberIncident(resolved.incident_id); setForget(null); setRemember(null); setNotice(`SESSION A COMPLETE · ${resolved.incident_id} is durable in Sibyl. Start a fresh Session B.`);
+      const created = await api<ProofRun>("/api/proof-runs", { method: "POST" });
+      const completed = await api<ProofRun>(`/api/proof-runs/${created.run_id}/session-a`, { method: "POST" });
+      setProof(completed); rememberProof(completed.run_id); setForget(null); setRemember(null);
+      if (completed.session_a?.incident_snapshot) setIncident(completed.session_a.incident_snapshot);
+      setNotice(`SESSION A ENDED · Sibyl write ${completed.session_a?.sibyl_memory_id} confirmed. Start fresh Session B.`);
     } catch (error) { setNotice((error as Error).message); }
     finally { setBusy(false); }
   }
 
   async function runFreshSessionB() {
-    const created = await startScenario("payments-queue");
-    const baseline = await runAnalysis("forget", created);
-    const informed = await runAnalysis("remember", created);
-    if (baseline && informed) setNotice(informed.memory_informed_decision.changed ? "FRESH SESSION PROOF PASSED · MEMORY CHANGED THIS DECISION" : "No qualifying prior memory found. Record Session A first.");
+    if (!proof?.session_a?.process_ended) { setNotice("Run Session A and confirm its process ended first."); return; }
+    setBusy(true);
+    try {
+      const completed = await api<ProofRun>(`/api/proof-runs/${proof.run_id}/session-b`, { method: "POST" });
+      setProof(completed);
+      if (completed.session_b?.incident_snapshot) setIncident(completed.session_b.incident_snapshot);
+      setForget(completed.session_b?.counterfactual_analysis ?? null);
+      setRemember(completed.session_b?.memory_analysis ?? null);
+      setProofOpen(true);
+      setNotice(completed.status === "passed" ? "FRESH PROCESS PROOF PASSED · MEMORY CHANGED THIS DECISION" : "Proof did not pass.");
+    } catch (error) { setNotice((error as Error).message); }
+    finally { setBusy(false); }
   }
 
   async function resolveRecommended() {
@@ -141,8 +169,21 @@ export default function Home() {
 
       <section className="demoRail panel">
         <div><span className="tag">LOAD-BEARING MEMORY PROOF</span><b>{notice}</b></div>
-        <div className="railActions"><button onClick={recordSessionA} disabled={busy}>1 · RECORD SESSION A</button><button className="primary" onClick={runFreshSessionB} disabled={busy}>2 · START FRESH SESSION B</button></div>
+        <div className="railActions"><button onClick={recordSessionA} disabled={busy}>1 · RUN SESSION A</button><button className="primary" onClick={runFreshSessionB} disabled={busy || !proof?.session_a?.process_ended}>2 · START FRESH SESSION B</button><button onClick={() => setProofOpen(!proofOpen)} disabled={!proof}>VIEW PROOF {proofOpen ? "×" : "↗"}</button></div>
       </section>
+
+      {proofOpen && proof && <section className="proofPanel panel" aria-label="Cross-session Sibyl proof inspector">
+        <div className="eyebrow"><span>VIEW PROOF · REAL CROSS-PROCESS ELIGIBILITY</span><b>{proof.status === "passed" ? "PROOF PASSED" : proof.status.toUpperCase()}</b></div>
+        <div className="proofFlow">
+          <div><small>SESSION A</small><b>{proof.session_a?.session_id ?? "NOT RUN"}</b><code>PID {proof.session_a?.process_id ?? "—"}</code><p>Baseline: <strong>{proof.session_a?.baseline_decision?.action ?? "—"}</strong></p><p>Bad outcome: {proof.session_a?.recorded_outcome?.detail ?? "—"}</p></div>
+          <span>→</span>
+          <div><small>SIBYL WRITE</small><b>{proof.session_a?.write_confirmed ? "WRITE CONFIRMED" : "PENDING"}</b><code>{proof.session_a?.sibyl_memory_id ?? "—"}</code><p>Read-after-write: {proof.session_a?.read_after_write_confirmed ? "confirmed" : "pending"}</p><p>Session A ended: {proof.session_a?.orchestrator_confirmed_exit_code === 0 ? "yes · exit 0" : "pending"}</p></div>
+          <span>→</span>
+          <div><small>FRESH SESSION B</small><b>{proof.session_b?.session_id ?? "NOT RUN"}</b><code>PID {proof.session_b?.process_id ?? "—"}</code><p>Retrieval event: {proof.session_b?.sibyl_retrieval_event_id ?? "—"}</p><p>Retrieved: {proof.session_b?.retrieved_experience?.incident_id ?? "—"}</p></div>
+        </div>
+        {proof.status === "passed" && <div className="proofVerdict"><b>MEMORY CHANGED THIS DECISION</b><span>Without memory: <code>{proof.session_b?.counterfactual_decision?.action}</code></span><span>With Sibyl memory: <code>{proof.session_b?.memory_informed_decision?.action}</code></span></div>}
+        <div className="proofDetails"><div><small>PROOF RUN / SIBYL RECORD</small><code>{proof.run_id} · {proof.sibyl_proof_record_id}</code><small>PROCESS ISOLATION</small><code>{proof.session_a?.process_id ?? "—"} ≠ {proof.session_b?.process_id ?? "—"} · tenant-isolated={String(proof.storage.tenant_isolated)}</code></div><div><small>RETRIEVED EXPERIENCE</small><code>{proof.session_b?.retrieved_experience ? `${proof.session_b.retrieved_experience.incident_id} · score ${pct(proof.session_b.retrieved_experience.score.total)} · ${proof.session_b.retrieved_experience.attempted_actions[0]?.detail}` : "—"}</code><small>BASE PROVENANCE</small><code>{proof.base.status} · chain {proof.base.chain_id} · {proof.base.transaction_hash ?? "no verified transaction"}</code></div></div>
+      </section>}
 
       {!incident ? (
         <section className="launchPanel panel">

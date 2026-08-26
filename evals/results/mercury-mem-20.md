@@ -1,6 +1,6 @@
 # MERCURY-MEM-20 measured results
 
-Generated: 2026-08-21T03:34:55.560162Z
+Generated: 2026-08-25T17:37:33.812369Z
 
 | Metric | No-memory baseline | MERCURY + Sibyl |
 |---|---:|---:|

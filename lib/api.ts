@@ -43,3 +43,19 @@ export type Commitments = {
   decision_hash: `0x${string}`; outcome_hash: `0x${string}`; contract_address?: `0x${string}`;
   chain_id: number; status: string;
 };
+export type ProofSession = {
+  session_id: string; process_id: number; process_started_at: string; process_ended: boolean;
+  process_ended_at: string; orchestrator_confirmed_exit_code?: number; orchestrator_confirmed_exit_at?: string;
+  incident_id: string; incident_snapshot?: Incident; sibyl_memory_id?: string; sibyl_journal_id?: string;
+  write_confirmed?: boolean; read_after_write_confirmed?: boolean; sibyl_retrieval_event_id?: string;
+  retrieved_memory_id?: string; retrieved_experience?: Evidence; counterfactual_decision?: Analysis["baseline_decision"];
+  memory_informed_decision?: Analysis["memory_informed_decision"]; counterfactual_analysis?: Analysis;
+  memory_analysis?: Analysis; policy?: Analysis["policy"]; retrieval_terms?: string[]; memory_changed_decision?: boolean;
+  baseline_decision?: Analysis["baseline_decision"]; recorded_outcome?: Incident["outcome"];
+};
+export type ProofRun = {
+  run_id: string; proof_version: string; status: "ready" | "session_a_ended" | "passed";
+  created_at: string; sibyl_proof_record_id: string; storage: { provider: string; tenant_isolated: boolean };
+  session_a: ProofSession | null; session_b: ProofSession | null;
+  base: Commitments & { network: string; transaction_hash?: string | null };
+};
