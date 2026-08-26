@@ -25,3 +25,15 @@ test("browser metadata uses the MERCURY icon and social card", async () => {
   assert.match(layout, /og\.png/);
   assert.match(layout, /Persistent Incident Intelligence/);
 });
+
+test("top navigation uses complete build documentation instead of the demo video", async () => {
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const docs = await readFile(new URL("../app/docs/page.tsx", import.meta.url), "utf8");
+  assert.match(page, /BUILD DOCS/);
+  assert.doesNotMatch(page, /DEMO VIDEO/);
+  assert.match(docs, /Product thesis/);
+  assert.match(docs, /Public API/);
+  assert.match(docs, /Function reference/);
+  assert.match(docs, /Real cross-session proof/);
+  assert.match(docs, /Base provenance/);
+});

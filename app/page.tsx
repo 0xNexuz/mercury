@@ -163,7 +163,7 @@ export default function Home() {
     <main className="shell">
       <header className="topbar">
         <div className="brand"><span className="brandMark">M</span><div><b>MERCURY</b><small>PERSISTENT INCIDENT INTELLIGENCE</small></div></div>
-        <nav className="topnav" aria-label="Command center sections"><a href="/mercury-demo.mp4" target="_blank" rel="noreferrer">DEMO VIDEO ↗</a><span>MEMORY TRACE</span><span>SAFETY</span><span>PROVENANCE</span></nav>
+        <nav className="topnav" aria-label="Command center sections"><a href="/docs">BUILD DOCS ↗</a><a href="/docs#memory">MEMORY TRACE</a><a href="/docs#safety">SAFETY</a><a href="/docs#provenance">PROVENANCE</a></nav>
         <div className="systemState"><span className={`pulse ${health?.status === "degraded" ? "bad" : ""}`} /> SIBYL MEMORY {health?.memory?.status?.toUpperCase() ?? "CHECKING"}<em>BASE SEPOLIA · {transactionHash ? "PENDING/VERIFIED" : "UNANCHORED"}</em></div>
       </header>
 

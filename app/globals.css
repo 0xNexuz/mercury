@@ -10,7 +10,7 @@ button:disabled { opacity:.45; cursor:not-allowed; }
 .brand { display:flex; align-items:center; gap:13px; letter-spacing:.16em; }
 .brandMark { display:grid; place-items:center; width:38px; height:38px; color:#071012; background:var(--cyan); font:900 20px var(--font-mono); clip-path:polygon(0 0,100% 0,100% 75%,75% 100%,0 100%); }
 .brand b { display:block; font-size:18px; }.brand small { display:block; color:var(--muted); font:10px var(--font-mono); margin-top:3px; }
-.topnav { display:flex; gap:26px; color:#6c767c; font:8px var(--font-mono); letter-spacing:.09em; }.topnav a { color:var(--cyan); text-decoration:none; }.topnav a:hover { color:#fff; }
+.topnav { display:flex; gap:26px; color:#6c767c; font:8px var(--font-mono); letter-spacing:.09em; }.topnav a { color:#6c767c; text-decoration:none; }.topnav a:first-child { color:var(--cyan); }.topnav a:hover { color:#fff; }
 .systemState { display:flex; gap:10px; align-items:center; color:var(--cyan); font:10px var(--font-mono); letter-spacing:.1em; }.systemState em { color:var(--muted); font-style:normal; padding-left:12px; border-left:1px solid var(--line); }.pulse { width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 14px var(--cyan); }
 .pulse.bad { background:var(--red); box-shadow:0 0 14px var(--red); }
 .commandGrid { display:grid; grid-template-columns:1.45fr .8fr; gap:14px; padding-top:22px; }.panel { background:linear-gradient(145deg,rgba(19,28,34,.97),rgba(12,18,22,.97)); border:1px solid var(--line); padding:24px; position:relative; overflow:hidden; }.panel:before { content:""; position:absolute; left:0; top:0; width:42px; height:2px; background:var(--cyan); }
