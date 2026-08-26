@@ -1,3 +1,5 @@
+param([switch]$SkipBuild)
+
 $ErrorActionPreference = "Stop"
 
 $projectRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
@@ -28,10 +30,14 @@ $env:PYTHONPATH = Join-Path $projectRoot "api"
 $env:SIBYL_DB_PATH = Join-Path $dataDir "memory.db"
 
 try {
-    Write-Host "Building the production dashboard for tunnel-safe client hydration..." -ForegroundColor DarkGray
-    $buildProcess = Start-Process -FilePath $npmExe -ArgumentList @("run", "build") -WorkingDirectory $projectRoot -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput (Join-Path $workDir "build.log") -RedirectStandardError (Join-Path $workDir "build-error.log")
-    if ($buildProcess.ExitCode -ne 0) {
-        throw "MERCURY production build failed. Inspect work/public-demo/build-error.log."
+    if (-not $SkipBuild) {
+        Write-Host "Building the production dashboard for tunnel-safe client hydration..." -ForegroundColor DarkGray
+        $buildProcess = Start-Process -FilePath $npmExe -ArgumentList @("run", "build") -WorkingDirectory $projectRoot -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput (Join-Path $workDir "build.log") -RedirectStandardError (Join-Path $workDir "build-error.log")
+        if ($buildProcess.ExitCode -ne 0) {
+            throw "MERCURY production build failed. Inspect work/public-demo/build-error.log."
+        }
+    } elseif (-not (Test-Path -LiteralPath (Join-Path $projectRoot ".next\BUILD_ID"))) {
+        throw "-SkipBuild requires an existing verified production build. Run npm run build first."
     }
     $apiStart = @{
         FilePath = $pythonExe

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-:root { --ink:#e8edf0; --muted:#7f8b92; --line:#253039; --panel:#11181d; --amber:#ffb547; --cyan:#5fd8da; --red:#ff6262; }
+:root { --ink:#e8edf0; --muted:#7f8b92; --line:#253039; --panel:#11181d; --amber:#ffb547; --cyan:#5fd8da; --red:#ff6262; --font-geist:Arial,"Helvetica Neue",sans-serif; --font-mono:"Cascadia Mono",Consolas,"Courier New",monospace; }
 * { box-sizing:border-box; }
 body { margin:0; background:#080d10; color:var(--ink); font-family:var(--font-geist),sans-serif; background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px); background-size:32px 32px; }
 button { font:inherit; }
