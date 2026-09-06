@@ -15,8 +15,6 @@ MERCURY is an incident-response command center built around the official [Sibyl 
 
 The primary proof is `INC-104`: restarting `payments-worker` worsens the incident through duplicate queue processing. A later fresh session retrieves `INC-104`, changes `restart_worker` to `drain_queue_then_rollback`, and displays **MEMORY CHANGED THIS DECISION**.
 
-[Watch the 27-second MERCURY demo](./public/mercury-demo.mp4) or open **DEMO VIDEO** in the deployed dashboard navigation.
-
 ## Run with Docker
 
 ```bash
@@ -45,6 +43,10 @@ npm run dev
 ```
 
 The script launches two independent Python processes against the same Sibyl file and fails unless Session B cites `INC-104` and changes the action.
+
+## Public judge deployment
+
+The preferred free-tier architecture keeps the dashboard on Vercel and runs FastAPI plus the official Sibyl SDK on one Google Compute Engine VM. Sibyl remains at `/data/memory.db` on persistent disk. See [GCP.md](GCP.md).
 
 ## Share a temporary public demo without Docker
 
@@ -82,7 +84,7 @@ docker compose --profile contracts run --rm contracts
 - **REAL:** Sibyl persistence, SQLite/FTS5 retrieval, fresh-process recall, deterministic memory influence, safety policy, commitment hashing, on-chain verification when configured.
 - **SIMULATED:** incident telemetry, mitigations, and recovery outcomes.
 - **OPTIONAL/DEFERRED:** Virtuals ACP specialist delegation.
-- **PUBLIC JUDGE PATH:** Cloudflare Tunnel exposes the native production build and real persistent Sibyl file at one HTTPS URL. The stable-host architecture uses a single persistent-volume backend; Vercel remains frontend-only.
+- **PUBLIC JUDGE PATH:** Vercel hosts the UI and proxies to one persistent Google VM backend. Cloudflare Tunnel remains a temporary fallback; Vercel never stores Sibyl's SQLite file.
 
 ## Documentation
 
@@ -93,3 +95,4 @@ docker compose --profile contracts run --rm contracts
 - [Evaluation](EVALUATION.md)
 - [Safety](SAFETY.md)
 - [Hosting and public proof](HOSTING.md)
+- [Google Cloud deployment](GCP.md)

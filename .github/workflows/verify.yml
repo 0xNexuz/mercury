@@ -1,0 +1,37 @@
+name: verify
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: api/requirements-dev.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: pip install -r api/requirements-dev.txt
+      - run: python -m pytest api/tests
+      - run: python -m ruff check api evals scripts
+      - run: npm ci --legacy-peer-deps
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: python scripts/fresh_session_smoke.py
+      - run: bash -n deploy/gcp/bootstrap.sh
+
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t mercury-contract-tests contracts
+      - run: docker run --rm mercury-contract-tests

@@ -9,10 +9,12 @@ Sibyl's official local client is intentionally SQLite/FTS5 and local-first. The 
 ## Delivery paths
 
 - **Immediate public judge path:** the native FastAPI and production Next.js processes share the real Sibyl file under `data/memory.db`; Cloudflare Tunnel exposes one same-origin HTTPS URL. Browser and API restarts do not erase the file. A Quick Tunnel URL lasts only while the launcher remains running.
-- **Stable production path:** one Railway FastAPI service, one persistent `/data` volume, one replica, and scheduled volume backups. The Vercel frontend proxies `/api/*` to that service through `MERCURY_API_ORIGIN`. Do not enable replicas while using one SQLite file.
+- **Preferred free-tier judge path:** one Google Compute Engine `e2-micro`, a standard persistent boot disk, and one FastAPI process with `SIBYL_DB_PATH=/data/memory.db`. Caddy supplies HTTPS and Vercel proxies `/api/*` through `MERCURY_API_ORIGIN`. See [GCP.md](GCP.md).
+- **Free-tier fallback:** one Oracle Always Free VM with persistent block storage. Capacity can be unavailable and idle resources can be reclaimed.
+- **Paid managed path:** one Railway or Render service, one persistent `/data` volume, and one replica.
 - **Reproduction paths retained:** Docker Compose uses the `mercury-sibyl` named volume; native smoke tests use an explicit database path.
 
-Official constraints: [Sibyl Memory](https://github.com/Sibyl-Labs/Sibyl-Memory), [Vercel SQLite guidance](https://vercel.com/kb/guide/is-sqlite-supported-in-vercel), [Railway volume reference](https://docs.railway.com/volumes/reference), and [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/).
+Official constraints: [Sibyl Memory](https://github.com/Sibyl-Labs/Sibyl-Memory), [Vercel SQLite guidance](https://vercel.com/kb/guide/is-sqlite-supported-in-vercel), [Google Cloud Free Tier](https://cloud.google.com/free/docs/free-cloud-features), and [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/).
 
 ## Proof isolation and red-team controls
 
